@@ -1,11 +1,13 @@
 import pandas as pd
 import json
+from ast import literal_eval
 
 def load_data(file_path):
     df = pd.read_csv(file_path)
+    df['act'] = df['act'].apply(literal_eval)  # Convert string representation of list to actual list
     dialogs = df['dialog'].apply(eval).tolist()
-    acts = df['act'].apply(eval).tolist()
-    emotions = df['emotion'].apply(eval).tolist()
+    acts = df['act'].tolist()
+    emotions = df['emotion'].tolist()
     return dialogs, acts, emotions
 
 def preprocess_data():
