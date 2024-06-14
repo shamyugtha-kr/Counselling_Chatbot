@@ -13,16 +13,13 @@ def load_data(file_path):
     acts = df['act'].tolist()
     emotions = df['emotion'].tolist()
     
-    return dialogs, acts, emotions
+    data = [{'dialog': dialog, 'act': act, 'emotion': emotion} for dialog, act, emotion in zip(dialogs, acts, emotions)]
+    return data
 
 def preprocess_data():
-    train_dialogs, train_acts, train_emotions = load_data('data/train.csv')
-    test_dialogs, test_acts, test_emotions = load_data('data/test.csv')
-    val_dialogs, val_acts, val_emotions = load_data('data/validation.csv')
-    
-    train_data = [{'dialog': dialog, 'act': act, 'emotion': emotion} for dialog, act, emotion in zip(train_dialogs, train_acts, train_emotions)]
-    test_data = [{'dialog': dialog, 'act': act, 'emotion': emotion} for dialog, act, emotion in zip(test_dialogs, test_acts, test_emotions)]
-    val_data = [{'dialog': dialog, 'act': act, 'emotion': emotion} for dialog, act, emotion in zip(val_dialogs, val_acts, val_emotions)]
+    train_data = load_data('data/train.csv')
+    test_data = load_data('data/test.csv')
+    val_data = load_data('data/validation.csv')
     
     with open('data/preprocessed_train.json', 'w') as f:
         json.dump(train_data, f)
