@@ -1,15 +1,51 @@
-from transformers import GPT2LMHeadModel, GPT2Tokenizer
-import torch
+# chatbot_interface.py
+import pickle
+import numpy as np
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 
-class Chatbot:
-    def __init__(self):
-        self.model = GPT2LMHeadModel.from_pretrained('models/emotional_support_bot')
-        self.tokenizer = GPT2Tokenizer.from_pretrained('models/emotional_support_bot')
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.model.to(self.device)
+# Load the saved models and tokenizer
+emotion_model = load_model('models/emotion_recognition_model.keras')
 
-    def generate_response(self, user_input):
-        input_ids = self.tokenizer.encode(user_input, return_tensors='pt').to(self.device)
-        chat_history_ids = self.model.generate(input_ids, max_length=1000, pad_token_id=self.tokenizer.eos_token_id)
-        response = self.tokenizer.decode(chat_history_ids[0], skip_special_tokens=True)
-        return response
+with open('data/tokenizer.pkl', 'rb') as f:
+    tokenizer = pickle.load(f)
+
+with open('data/label_encoder.pkl', 'rb') as f:
+    label_encoder = pickle.load(f)
+
+# Load preprocessed data to get the maxlen for padding
+with open('data/preprocessed_data.pkl', 'rb') as f:
+    X_train, X_test, y_train, y_test = pickle.load(f)
+maxlen = X_train.shape[1]
+
+# Function to predict emotion
+def predict_emotion(text):
+    seq = tokenizer.texts_to_sequences([text])
+    padded = pad_sequences(seq, maxlen=maxlen)
+    pred = emotion_model.predict(padded)
+    emotion = label_encoder.inverse_transform([np.argmax(pred)])
+    return emotion[0]
+
+# Example chatbot response function
+def chatbot_response(message):
+    emotion = predict_emotion(message)
+    if emotion == 'joy':
+        response = "I'm glad to hear that! How can I assist you further?"
+    elif emotion == 'anger':
+        response = "I'm sorry you're feeling this way. Let's try to find a solution together."
+    elif emotion == 'sadness':
+        response = "I'm here for you. What's on your mind?"
+    elif emotion == 'fear':
+        response = "Take a deep breath. Let's work through this together."
+    else:
+        response = "Tell me more about what's going on."
+    return response
+
+# Interactive loop
+if __name__ == "__main__":
+    while True:
+        message = input("You: ")
+        if message.lower() == "quit":
+            break
+        response = chatbot_response(message)
+        print(f"Bot: {response}")
