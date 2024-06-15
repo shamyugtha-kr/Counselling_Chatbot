@@ -41,11 +41,3 @@ def chatbot_response(message):
         response = "Tell me more about what's going on."
     return response
 
-# Interactive loop
-if __name__ == "__main__":
-    while True:
-        message = input("You: ")
-        if message.lower() == "quit":
-            break
-        response = chatbot_response(message)
-        print(f"Bot: {response}")
