@@ -2,17 +2,14 @@ import torch
 
 class CustomDataCollator:
     def __call__(self, features):
-        dialogues = [feature['dialog'] for feature in features]
-        acts = [feature['act'] for feature in features]
-        emotions = [feature['emotion'] for feature in features]
-
-        # Convert to tensors
-        dialogues = torch.tensor(dialogues, dtype=torch.long)
-        acts = torch.tensor(acts, dtype=torch.long)
-        emotions = torch.tensor(emotions, dtype=torch.long)
+        input_ids = [feature['input_ids'] for feature in features]
+        label_acts = [feature['labels']['act'] for feature in features]
+        label_emotions = [feature['labels']['emotion'] for feature in features]
 
         return {
-            'input_ids': dialogues,
-            'labels': acts,
-            'emotions': emotions,
+            'input_ids': torch.stack(input_ids, dim=0),
+            'labels': {
+                'act': torch.stack(label_acts, dim=0),
+                'emotion': torch.stack(label_emotions, dim=0),
+            },
         }

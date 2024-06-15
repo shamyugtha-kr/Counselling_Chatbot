@@ -1,36 +1,37 @@
 import pandas as pd
 import json
-from ast import literal_eval
 
-def load_data(file_path):
-    df = pd.read_csv(file_path)
+def preprocess_dataset(input_csv, output_json):
+    df = pd.read_csv(input_csv)
+    dialog_pairs = []
     
-    # Convert string representation of lists to actual lists
-    df['act'] = df['act'].apply(lambda x: literal_eval(x.replace(' ', ',')))
-    df['emotion'] = df['emotion'].apply(lambda x: literal_eval(x.replace(' ', ',')))
-    
-    dialogs = df['dialog'].apply(eval).tolist()
-    acts = df['act'].tolist()
-    emotions = df['emotion'].tolist()
-    
-    data = [{'dialog': dialog, 'act': act, 'emotion': emotion} for dialog, act, emotion in zip(dialogs, acts, emotions)]
-    return data
-
-def preprocess_data():
-    train_data = load_data('data/train.csv')
-    test_data = load_data('data/test.csv')
-    val_data = load_data('data/validation.csv')
-    
-    with open('data/preprocessed_train.json', 'w') as f:
-        json.dump(train_data, f)
+    for index, row in df.iterrows():
+        dialog = row['dialog']
+        acts_str = row['act'].strip()
+        emotions_str = row['emotion'].strip()
         
-    with open('data/preprocessed_test.json', 'w') as f:
-        json.dump(test_data, f)
+        # Remove enclosing square brackets if they exist
+        acts_str = acts_str.strip('[]')
+        emotions_str = emotions_str.strip('[]')
         
-    with open('data/preprocessed_val.json', 'w') as f:
-        json.dump(val_data, f)
+        # Splitting space-separated values
+        acts = acts_str.split()
+        emotions = emotions_str.split()
         
-    print("Data preprocessing complete. Saved to JSON files.")
+        # Matching the lengths of acts and emotions lists
+        min_len = min(len(acts), len(emotions))
+        acts = acts[:min_len]
+        emotions = emotions[:min_len]
+        
+        for act, emotion in zip(acts, emotions):
+            dialog_pairs.append((dialog, int(act), int(emotion)))
+    
+    with open(output_json, 'w') as f:
+        json.dump(dialog_pairs, f)
 
 if __name__ == "__main__":
-    preprocess_data()
+    preprocess_dataset('data/train.csv', 'data/train.json')
+    preprocess_dataset('data/validation.csv', 'data/validation.json')
+    preprocess_dataset('data/test.csv', 'data/test.json')
+    
+    print("Preprocessing complete.")
