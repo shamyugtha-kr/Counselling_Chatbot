@@ -1,15 +1,20 @@
+# data_preprocessing.py
 import pandas as pd
-import numpy as np
 import re
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+import pickle
 
 nltk.download('stopwords')
 nltk.download('wordnet')
 
 # Load the dataset
-data = pd.read_csv('dataset.csv')
+data = pd.read_csv('data/dataset.csv')
 
 # Initialize lemmatizer
 lemmatizer = WordNetLemmatizer()
@@ -44,3 +49,13 @@ y = data['sentiment'].values
 
 # Split data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Save preprocessed data and tokenizer
+with open('preprocessed_data.pkl', 'wb') as f:
+    pickle.dump((X_train, X_test, y_train, y_test), f)
+
+with open('tokenizer.pkl', 'wb') as f:
+    pickle.dump(tokenizer, f)
+
+with open('label_encoder.pkl', 'wb') as f:
+    pickle.dump(label_encoder, f)
