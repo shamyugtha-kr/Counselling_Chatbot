@@ -1,37 +1,28 @@
 import pandas as pd
-import json
+import numpy as np
+import re
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
 
-def preprocess_dataset(input_csv, output_json):
-    df = pd.read_csv(input_csv)
-    dialog_pairs = []
-    
-    for index, row in df.iterrows():
-        dialog = row['dialog']
-        acts_str = row['act'].strip()
-        emotions_str = row['emotion'].strip()
-        
-        # Remove enclosing square brackets if they exist
-        acts_str = acts_str.strip('[]')
-        emotions_str = emotions_str.strip('[]')
-        
-        # Splitting space-separated values
-        acts = acts_str.split()
-        emotions = emotions_str.split()
-        
-        # Matching the lengths of acts and emotions lists
-        min_len = min(len(acts), len(emotions))
-        acts = acts[:min_len]
-        emotions = emotions[:min_len]
-        
-        for act, emotion in zip(acts, emotions):
-            dialog_pairs.append((dialog, int(act), int(emotion)))
-    
-    with open(output_json, 'w') as f:
-        json.dump(dialog_pairs, f)
+nltk.download('stopwords')
+nltk.download('wordnet')
 
-if __name__ == "__main__":
-    preprocess_dataset('data/train.csv', 'data/train.json')
-    preprocess_dataset('data/validation.csv', 'data/validation.json')
-    preprocess_dataset('data/test.csv', 'data/test.json')
-    
-    print("Preprocessing complete.")
+# Load your dataset
+data = pd.read_csv('emotions_dataset.csv')
+
+# Initialize lemmatizer
+lemmatizer = WordNetLemmatizer()
+
+# Preprocessing function
+def preprocess_text(text):
+    text = re.sub(r'\W', ' ', text)  # Remove all non-word characters
+    text = re.sub(r'\s+', ' ', text, flags=re.I)  # Remove all extra spaces
+    text = text.lower()  # Convert to lower case
+    text = text.split()
+    text = [lemmatizer.lemmatize(word) for word in text if word not in stopwords.words('english')]
+    text = ' '.join(text)
+    return text
+
+# Apply preprocessing
+data['Text'] = data['Text'].apply(preprocess_text)
