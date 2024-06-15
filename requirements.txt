@@ -7,3 +7,4 @@ tensorflow
 numpy
 scikit-learn
 nltk
+joblib
