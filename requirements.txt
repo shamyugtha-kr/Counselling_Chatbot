@@ -3,3 +3,7 @@ transformers
 torch
 pandas
 accelerate
+tensorflow
+numpy
+scikit-learn
+nltk
