@@ -1,1 +1,4 @@
 chatbot_env/
+models/__pycache__
+models/counseling_gpt2
+logs/
