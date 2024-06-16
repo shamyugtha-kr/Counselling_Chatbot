@@ -1,0 +1,11 @@
+body {
+    background-color: #f8f9fa;
+}
+
+#chatbox {
+    background-color: #fff;
+}
+
+#chatbox-content {
+    font-size: 16px;
+}

@@ -51,11 +51,11 @@ y = data['sentiment'].values
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Save preprocessed data and tokenizer
-with open('preprocessed_data.pkl', 'wb') as f:
+with open('data/preprocessed_data.pkl', 'wb') as f:
     pickle.dump((X_train, X_test, y_train, y_test), f)
 
-with open('tokenizer.pkl', 'wb') as f:
+with open('data/tokenizer.pkl', 'wb') as f:
     pickle.dump(tokenizer, f)
 
-with open('label_encoder.pkl', 'wb') as f:
+with open('data/label_encoder.pkl', 'wb') as f:
     pickle.dump(label_encoder, f)
