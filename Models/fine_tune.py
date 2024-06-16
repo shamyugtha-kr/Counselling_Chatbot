@@ -4,7 +4,7 @@ from datasets import load_dataset
 from transformers import GPT2LMHeadModel, GPT2Tokenizer, Trainer, TrainingArguments, DataCollatorForLanguageModeling
 
 # Load the dataset
-dataset = load_dataset('empathetic_dialogues', split='train', trust_remote_code=True)
+dataset = load_dataset('empathetic_dialogues', split='train[:1%]', trust_remote_code=True)
 
 # Initialize the model and tokenizer
 model_name = 'gpt2'  # Switch to the smaller GPT-2 model
